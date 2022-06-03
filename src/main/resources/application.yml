@@ -1,0 +1,6 @@
+#google drive api
+ google : 
+  service_account_email : repository@repository-351916.iam.gserviceaccount.com
+  application_name : Repository
+  folder_id : 1CHQ9gYsfDlumYBmnSDleYAQD1d3P9MwL
+  service_account_key : repository-351916-2781e26fc22e.p12
