@@ -2,7 +2,7 @@ package com.repository.repository.entities;
 
 import org.apache.coyote.http11.filters.VoidInputFilter;
 
-public class MyCredentials {
+public class CredentialsInput {
 	private String username;
 	private String password;
 	

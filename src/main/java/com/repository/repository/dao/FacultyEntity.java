@@ -1,23 +1,26 @@
 package com.repository.repository.dao;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
 
-@Entity
-public class studentinfo {
+@Entity(name="faculty")
+@Table(name="faculty")
+public class FacultyEntity {
+	
 	
 	@Id
-	String usn;
+	String facultyid;
 	String name;
 	
-	public String getUsn() {
-		return usn;
+	public String getId() {
+		return facultyid;
 	}
-	public void setUsn(String usn) {
-		this.usn = usn;
+	public void setId(String facultyid) {
+		this.facultyid = facultyid;
 	}
 	public String getName() {
 		return name;
@@ -25,6 +28,5 @@ public class studentinfo {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+
 }

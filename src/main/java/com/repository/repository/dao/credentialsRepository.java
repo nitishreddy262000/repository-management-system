@@ -10,4 +10,6 @@ public interface credentialsRepository extends JpaRepository<credentialsentity, 
 
 	List<credentialsentity> findByUsername(String username);
 	List<credentialsentity> findByPassword(String password);
+	
+	
 }

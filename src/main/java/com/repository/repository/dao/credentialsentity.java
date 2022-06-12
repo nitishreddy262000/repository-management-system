@@ -9,11 +9,25 @@ public class credentialsentity {
 	@Id
 	String username;
 	String password;
+	String userType;
 	
-	public String getusername() {
+	public String getUserType() {
+		return userType;
+	}
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+	public String getUsername() {
 		return username;
-	} 
-	public String getpassword() {
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
 		return password;
-	} 
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 }

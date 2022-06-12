@@ -19,11 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.services.drive.model.File;
+import com.repository.repository.dao.CredentialsDao;
+import com.repository.repository.dao.FacultyEntity;
+import com.repository.repository.dao.FacultyRepositoryDao;
+import com.repository.repository.dao.StudentInfoDao;
 import com.repository.repository.dao.StudentInfoRepository;
 import com.repository.repository.dao.credentialsRepository;
 import com.repository.repository.dao.credentialsentity;
 import com.repository.repository.dao.studentinfo;
-import com.repository.repository.entities.MyCredentials;
+import com.repository.repository.entities.CredentialsInput;
+import com.repository.repository.entities.CredentialsOutput;
+import com.repository.repository.entities.SignupInput;
 import com.spring.service.GoogleDriveService;
 import com.spring.service.imp.GoogleDriveServiceImp;
 
@@ -39,27 +45,67 @@ public class MyController {
 	private StudentInfoRepository studentInfoRepository;
 	@Autowired
 	private credentialsRepository credentialsRepository;
+	@Autowired
+	private FacultyRepositoryDao facultyRepositoryDao;
+	@Autowired
+	private CredentialsDao credentialsDao;
+	@Autowired
+	private StudentInfoDao studentInfoDao;
 	
 	@PostMapping("/api/v1/login")
-	public String login(@RequestBody MyCredentials loginCredentials) {
+	public CredentialsOutput login(@RequestBody CredentialsInput loginCredentials) {
 		
-	List<credentialsentity> dbcredentials= credentialsRepository.findByUsername(loginCredentials.getUsername());
-	if (dbcredentials != null && !dbcredentials.isEmpty()) {
-		credentialsentity dbCred = dbcredentials.get(0);
-		String dbPassword = dbCred.getpassword();
-		String loginpassword = loginCredentials.getPassword();
-		System.out.println("dbPassword=" + dbPassword + " loginpassword=" + loginpassword);
-		if(loginpassword.equals(dbPassword)) {
-			return "Valid";
+		List<credentialsentity> dbcredentials= credentialsRepository.findByUsername(loginCredentials.getUsername());
+		CredentialsOutput credentialsOutput = new CredentialsOutput();
+		credentialsOutput.setValid(false);
+		
+		if (dbcredentials != null && !dbcredentials.isEmpty()) {
+			credentialsentity dbCred = dbcredentials.get(0);
+			String dbPassword = dbCred.getPassword();
+			String loginpassword = loginCredentials.getPassword();
+			credentialsOutput.setUserType(dbCred.getUserType());
+			System.out.println("dbPassword=" + dbPassword + " loginpassword=" + loginpassword);
+			if(loginpassword.equals(dbPassword)) {
+				credentialsOutput.setValid(true);
+			} 
 		}
-	}
-	return "Invalid";
+		return credentialsOutput;
 	
+	}
+	
+	@PostMapping("/api/v1/signup")
+	public ResponseEntity signup(@RequestBody SignupInput signupInput) {
+		
+		if("FACULTY".equals(signupInput.getUserType())) {
+			FacultyEntity facultyEntity = new FacultyEntity();
+			facultyEntity.setId(signupInput.getUsn());
+			facultyEntity.setName(signupInput.getName());
+			facultyRepositoryDao.insert(facultyEntity);
+
+			credentialsentity credentialsentity = new credentialsentity();
+			credentialsentity.setUserType("FACULTY");
+			credentialsentity.setUsername(signupInput.getEmail());
+			credentialsentity.setPassword(signupInput.getPassword());
+			credentialsDao.insert(credentialsentity);
+			
+		} else if ("STUDENT".equals(signupInput.getUserType())) {
+			studentinfo studentinfo = new studentinfo();
+			studentinfo.setName(signupInput.getName());
+			studentinfo.setUsn(signupInput.getUsn());
+			studentInfoDao.insert(studentinfo);
+			
+			credentialsentity credentialsentity = new credentialsentity();
+			credentialsentity.setUserType("STUDENT");
+			credentialsentity.setUsername(signupInput.getEmail());
+			credentialsentity.setPassword(signupInput.getPassword());
+			credentialsDao.insert(credentialsentity);
+		}
+		return ResponseEntity.ok().build();
 	}
 	
 	@GetMapping("/api/v1/studentinfo/usn/{usn}")
 	public studentinfo usn(@PathVariable String usn) {
-		System.out.println(studentInfoRepository.findByUsn(usn).get(0).getname()); 
+		System.out.println(studentInfoRepository.findByUsn(usn).get(0).getName()); 
 		return studentInfoRepository.findByUsn(usn).get(0);
 	}
 	
