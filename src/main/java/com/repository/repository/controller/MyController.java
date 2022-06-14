@@ -1,12 +1,20 @@
 package com.repository.repository.controller;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapProperties.Credential;
 import org.springframework.cglib.core.CollectionUtils;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +35,7 @@ import com.repository.repository.dao.StudentInfoRepository;
 import com.repository.repository.dao.credentialsRepository;
 import com.repository.repository.dao.credentialsentity;
 import com.repository.repository.dao.studentinfo;
+import com.repository.repository.entities.AllStudentsInfo;
 import com.repository.repository.entities.CredentialsInput;
 import com.repository.repository.entities.CredentialsOutput;
 import com.repository.repository.entities.SignupInput;
@@ -53,7 +62,7 @@ public class MyController {
 	private StudentInfoDao studentInfoDao;
 	
 	@PostMapping("/api/v1/login")
-	public CredentialsOutput login(@RequestBody CredentialsInput loginCredentials) {
+	public ResponseEntity<CredentialsOutput> login(@RequestBody CredentialsInput loginCredentials) {
 		
 		List<credentialsentity> dbcredentials= credentialsRepository.findByUsername(loginCredentials.getUsername());
 		CredentialsOutput credentialsOutput = new CredentialsOutput();
@@ -69,7 +78,8 @@ public class MyController {
 				credentialsOutput.setValid(true);
 			} 
 		}
-		return credentialsOutput;
+		return ResponseEntity.ok().body(credentialsOutput);
+
 	
 	}
 	
@@ -100,7 +110,18 @@ public class MyController {
 			credentialsentity.setPassword(signupInput.getPassword());
 			credentialsDao.insert(credentialsentity);
 		}
+		System.out.println("Signup successful");
 		return ResponseEntity.ok().build();
+		//.header("Access-Control-Allow-Origin", "*")
+	}
+	
+	@GetMapping("/api/v1/studentinfo/all")
+	public AllStudentsInfo getAllStudents() {
+		List<studentinfo> suList =  studentInfoRepository.findAll();
+		AllStudentsInfo allStudentsInfo = new AllStudentsInfo();
+		allStudentsInfo.setStudentsList(suList);
+		
+		return allStudentsInfo;
 	}
 	
 	@GetMapping("/api/v1/studentinfo/usn/{usn}")
@@ -134,7 +155,7 @@ public class MyController {
     
     @PostMapping(value = "/upload/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity testFolder(@RequestParam MultipartFile file) throws IOException {
-
+    	System.out.println("upload file");
     	
 		com.google.api.services.drive.model.File file2  = driveService.upLoadFileNew(convertMultiPartToFile(file),null);
 		try {
@@ -144,6 +165,46 @@ public class MyController {
 		}
 		return ResponseEntity.ok().build();
 	}
+    
+    
+    @GetMapping("/view/files")
+	public List<String> view() throws IOException {
+		return driveService.viewFiles();
+	}
+    
+    @GetMapping("/view/file/{filename}")
+//    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public OutputStream download(@RequestParam String fileName) throws IOException {
+    	int x = 1;
+//		OutputStream outputStream = driveService.getFile(fileName);
+//		InputStreamResource inputStreamResource = new InputStreamResource(outputStream);
+//		return new ResponseEntity(inputStreamResource, headers, HttpStatus.OK);
+//		return outputStream;
+    	return null;
+	}
+    
+//    @GetMapping("/download")
+//    public void downlString() throws IOException {
+//    	final String path = "some_150_mb_file";
+//    	
+//    	int x = 1;
+//    	byte[] outputStream = driveService.getFile("1QI73kpEb9wECp5gKlKh_6n9x-GQ7QFqw");
+//    	byte[] buffer = new byte[8192];
+//    	int bytesRead = -1;
+//    	
+//    	outputStream.close();
+//    	
+//    	 InputStream is = new FileInputStream(path);
+//         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//         int len;
+//         byte[] buffer = new byte[4096];
+//         while ((len = is.read(buffer, 0, buffer.length)) != -1) {
+//             baos.write(buffer, 0, len);
+//         }
+//         System.out.println("Server size: " + baos.size());
+//         return Response.ok(baos).build();
+//    	
+//    }
     
     private java.io.File convertMultiPartToFile(MultipartFile file ) throws IOException {
         java.io.File convFile = new java.io.File( file.getOriginalFilename() );

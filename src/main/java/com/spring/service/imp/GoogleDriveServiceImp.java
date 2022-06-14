@@ -1,8 +1,13 @@
 package com.spring.service.imp;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +23,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 import com.spring.service.GoogleDriveService;
 
 @Service
@@ -98,6 +104,34 @@ public class GoogleDriveServiceImp implements GoogleDriveService{
 			LOGGER.error(e.getMessage());
 		}
 		return file;
+	}
+	
+	public List<String> viewFiles() throws IOException {
+	 String pageToken = null;
+	 List<String> allFiles = new ArrayList<>();
+	 do {
+	   FileList result = getDriveService().files().list()
+//	       .setQ("mimeType='application/vnd.google-apps.folder'")
+	       .setSpaces("drive")
+	       .setFields("nextPageToken, files(id, name)")
+	       .setPageToken(pageToken)
+	       .execute();
+	   for (File file : result.getFiles()) {
+	     System.out.printf("Found file: %s (%s)\n",
+	         file.getName(), file.getId());
+	     allFiles.add(file.getName());
+	   }
+	   pageToken = result.getNextPageToken();
+	 } while (pageToken != null);
+	 
+	 return allFiles;
+	} 
+	
+	public byte[] getFile(String fileId) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		getDriveService().files().get(fileId)
+		    .executeMediaAndDownloadTo(outputStream);
+		return outputStream.toByteArray();
 	} 
 
 }

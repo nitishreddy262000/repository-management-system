@@ -10,4 +10,6 @@ public interface StudentInfoRepository extends JpaRepository<studentinfo, String
 
 	List<studentinfo> findByUsn(String usn);
 	List<studentinfo> findByName(String name);
+	List<studentinfo> findAll();
+	
 }
