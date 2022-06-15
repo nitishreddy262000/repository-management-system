@@ -91,7 +91,7 @@ public class MyController {
 	
 	@PostMapping("/api/v1/signup")
 	public ResponseEntity signup(@RequestBody SignupInput signupInput) {
-		
+		System.out.println(signupInput.getAcademicyear());
 		if("FACULTY".equals(signupInput.getUserType())) {
 			FacultyEntity facultyEntity = new FacultyEntity();
 			facultyEntity.setId(signupInput.getUsn());
@@ -108,7 +108,11 @@ public class MyController {
 			studentinfo studentinfo = new studentinfo();
 			studentinfo.setName(signupInput.getName());
 			studentinfo.setUsn(signupInput.getUsn());
+			studentinfo.setAcademicyear(signupInput.getAcademicyear());
+			studentinfo.setBatchnumber(signupInput.getBatchnumber());
+			studentinfo.setGuidename(signupInput.getGuidename());
 			studentInfoDao.insert(studentinfo);
+			
 			
 			credentialsentity credentialsentity = new credentialsentity();
 			credentialsentity.setUserType("STUDENT");
@@ -145,7 +149,6 @@ public class MyController {
 	
 	@PostMapping("/api/v1/review")
 	public ResponseEntity<?> giveReview(@RequestBody ReviewInput reviewInput) {
-		System.out.println("HIII");
 		ReviewEntity reviewEntity = new ReviewEntity();
 		reviewEntity.setReviewId(new ReviewId(reviewInput.getUsn(), reviewInput.getBatch()));
 		reviewEntity.setMarks(reviewInput.getMarks());

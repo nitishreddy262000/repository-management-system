@@ -12,6 +12,12 @@ public class studentinfo {
 	@Id
 	String usn;
 	String name;
+	@Column(name="academic_year")
+	int academicyear;
+	@Column(name="batch_number")
+	int batchnumber;
+	@Column(name="guide_name")
+	String guidename;
 	
 	public String getUsn() {
 		return usn;
@@ -25,6 +31,25 @@ public class studentinfo {
 	public void setName(String name) {
 		this.name = name;
 	}
+	public int getAcademicyear() {
+		return academicyear;
+	}
+	public void setAcademicyear(int academicyear) {
+		this.academicyear = academicyear;
+	}
+	public int getBatchnumber() {
+		return batchnumber;
+	}
+	public void setBatchnumber(int batchnumber) {
+		this.batchnumber = batchnumber;
+	}
+	public String getGuidename() {
+		return guidename;
+	}
+	public void setGuidename(String guidename) {
+		this.guidename = guidename;
+	}
+	
 	
 	
 }
