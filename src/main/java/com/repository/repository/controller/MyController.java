@@ -30,6 +30,9 @@ import com.google.api.services.drive.model.File;
 import com.repository.repository.dao.CredentialsDao;
 import com.repository.repository.dao.FacultyEntity;
 import com.repository.repository.dao.FacultyRepositoryDao;
+import com.repository.repository.dao.ReviewDao;
+import com.repository.repository.dao.ReviewEntity;
+import com.repository.repository.dao.ReviewId;
 import com.repository.repository.dao.StudentInfoDao;
 import com.repository.repository.dao.StudentInfoRepository;
 import com.repository.repository.dao.credentialsRepository;
@@ -38,6 +41,7 @@ import com.repository.repository.dao.studentinfo;
 import com.repository.repository.entities.AllStudentsInfo;
 import com.repository.repository.entities.CredentialsInput;
 import com.repository.repository.entities.CredentialsOutput;
+import com.repository.repository.entities.ReviewInput;
 import com.repository.repository.entities.SignupInput;
 import com.spring.service.GoogleDriveService;
 import com.spring.service.imp.GoogleDriveServiceImp;
@@ -60,6 +64,8 @@ public class MyController {
 	private CredentialsDao credentialsDao;
 	@Autowired
 	private StudentInfoDao studentInfoDao;
+	@Autowired
+	private ReviewDao reviewDao;
 	
 	@PostMapping("/api/v1/login")
 	public ResponseEntity<CredentialsOutput> login(@RequestBody CredentialsInput loginCredentials) {
@@ -134,6 +140,19 @@ public class MyController {
 	public studentinfo name(@PathVariable String name) {
 		System.out.println(studentInfoRepository.findByName(name)); 
 		return studentInfoRepository.findByName(name).get(0);
+	}
+	
+	
+	@PostMapping("/api/v1/review")
+	public ResponseEntity<?> giveReview(@RequestBody ReviewInput reviewInput) {
+		System.out.println("HIII");
+		ReviewEntity reviewEntity = new ReviewEntity();
+		reviewEntity.setReviewId(new ReviewId(reviewInput.getUsn(), reviewInput.getBatch()));
+		reviewEntity.setMarks(reviewInput.getMarks());
+		reviewEntity.setReview(reviewInput.getReview());
+		reviewDao.insert(reviewEntity);
+		return ResponseEntity.ok().build();
+		
 	}
 	
 	
